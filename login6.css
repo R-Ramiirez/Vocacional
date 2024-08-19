@@ -1,0 +1,43 @@
+body {
+  background: #dedede;
+  font-family: sans-serif;
+  font-size: 15px;
+}
+
+.ingreso{
+  width: 50%;
+}
+
+#container {
+  border: 1px solid #430057;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #ddd;
+  width: 50%;
+}
+
+#container1 {
+  border: 1px solid #430057;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #ddd;
+  width: 15%;
+  font-size: 18px;
+}
+
+.header{
+  padding: 1% 0% 0% 15%;
+}
+
+.header__menu{
+  display: flex;
+  gap: 30px;
+}
+
+.header__menu__link{
+  font-family: var(--fuente-montserrat);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-terciario);
+  text-decoration: none;
+}
