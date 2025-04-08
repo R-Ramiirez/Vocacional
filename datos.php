@@ -1,7 +1,25 @@
 <?php
-
 include("conexion.php");
+include("_functions.php");
 
+// Procesamiento de eliminación
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['rut'])) {
+    $rut_eliminar = $_POST['rut'];
+    $resultado = eliminar_estudiante($rut_eliminar);
+
+    if ($resultado === true) {
+        // Redirigir a la misma página para refrescar la tabla
+        header("Location: datos.php?eliminado=1");
+        exit();
+    } else {
+        $error_mensaje = $resultado;
+    }
+}
+
+// Mostrar mensaje de éxito
+if (isset($_GET['eliminado']) && $_GET['eliminado'] == 1) {
+    $mensaje_exito = "Estudiante eliminado correctamente";
+}
 ?>
 
 <!DOCTYPE html>
@@ -19,8 +37,10 @@ include("conexion.php");
 
 <body>
     <header class="header">
-        <nav class="header__menu navbar navbar-expand-lg bg-opacity-10">
+    <nav class="header__menu navbar navbar-expand-lg bg-opacity-10">
             <a class="header__menu__link" href="login.php">Cerrar Sesion</a>
+            <a class="header__menu__link" href="datos.php">Estudiantes</a>
+            <a class="header__menu__link" href="actualizar.php">Agregar Datos</a>
             <a class="header__menu__link" href="porcentajes.php">Datos</a>
         </nav>
     </header>
@@ -29,6 +49,21 @@ include("conexion.php");
             <div class="col-md-10">
                 <h1 class="display-4 text-center mb-3 mt-4">Datos de Pruebas de Estudiantes</h1>
                 <hr class="bg-info">
+
+                <?php if (isset($mensaje_exito)): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <?php echo $mensaje_exito; ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($error_mensaje)): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <?php echo $error_mensaje; ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
+
                 <p class="text-danger small pt-0 mt-0 mx-4">*Datos con proteccion sobre divulgacion.</p>
                 <?php
                 $conex = mysqli_connect("$servername", "$username", "$password", "$database");
@@ -36,7 +71,6 @@ include("conexion.php");
 
                 if (isset($_GET['enviar'])) {
                     $busqueda = $_GET['busqueda'];
-
 
                     if (isset($_GET['busqueda'])) {
                         $where = "WHERE estudiantes.RUT LIKE'%" . $busqueda . "%' OR nombre  LIKE'%" . $busqueda . "%'
@@ -66,6 +100,7 @@ include("conexion.php");
                         <th class="col-1 text-center">ESTADO DEL TEST</th>
                         <th class="col-1 text-center">EDITAR</th>
                         <th class="col-1 text-center">VER</th>
+                        <th class="col-1 text-center">ELIMINAR</th>
                     </tr>
                     <?php
                     $conex = mysqli_connect("$servername", "$username", "$password", "$database");
@@ -100,6 +135,11 @@ include("conexion.php");
                                 <td class="text-center">
                                     <a class="btn btn-success" href="vistaUsuario.php?rut=<?php echo $rut_estudiante ?>"><i class="fa-solid fa-eye"></i></a>
                                 </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-rut="<?php echo $rut_estudiante; ?>">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
                             </tr>
                         <?php
                         }
@@ -123,9 +163,43 @@ include("conexion.php");
         <br>
         <hr>
     </div>
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Estudiante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar este estudiante?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form id="deleteForm" method="POST" action="datos.php">
+                        <input type="hidden" name="rut" id="rutToDelete">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var rut = button.getAttribute('data-rut');
+                var rutInput = document.getElementById('rutToDelete');
+                rutInput.value = rut;
+            });
+        });
+    </script>
     <script src="buscador.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

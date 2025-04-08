@@ -22,6 +22,8 @@ include("conexion.php");
         <nav class="header__menu navbar navbar-expand-lg bg-opacity-10">
             <a class="header__menu__link" href="login.php">Cerrar Sesion</a>
             <a class="header__menu__link" href="datos.php">Estudiantes</a>
+            <a class="header__menu__link" href="actualizar.php">Agregar Datos</a>
+            <a class="header__menu__link" href="porcentajes.php">Datos</a>
         </nav>
     </header>
     <div class="container">

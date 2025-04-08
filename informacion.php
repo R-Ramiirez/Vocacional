@@ -1,7 +1,5 @@
 <?php
-
 include("conexion.php");
-
 ?>
 
 <!DOCTYPE html>
@@ -19,9 +17,11 @@ include("conexion.php");
 
 <body>
     <header class="header">
-        <nav class="header__menu navbar navbar-expand-lg bg-opacity-10">
+    <nav class="header__menu navbar navbar-expand-lg bg-opacity-10">
+            <a class="header__menu__link" href="login.php">Cerrar Sesion</a>
+            <a class="header__menu__link" href="datos.php">Estudiantes</a>
+            <a class="header__menu__link" href="actualizar.php">Agregar Datos</a>
             <a class="header__menu__link" href="porcentajes.php">Datos</a>
-            <a class="header__menu__link" href="index.php">Salir</a>
         </nav>
     </header>
 

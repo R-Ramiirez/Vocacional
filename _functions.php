@@ -11,7 +11,7 @@ if (isset($_POST['accion'])) {
             break;
 
         case 'eliminar_estudiante';
-            eliminar_estudiante();
+            eliminar_estudiante($rut);
             break;
 
         case 'acceso_user';
@@ -22,7 +22,7 @@ if (isset($_POST['accion'])) {
 
 function editar_estudiantes()
 {
-    $conex = mysqli_connect("localhost", "root", "", "registro");
+    $conex = mysqli_connect("localhost", "root", "", "testvocacional");
     extract($_POST);
     $rut = $_POST['rut'];
 
@@ -38,22 +38,32 @@ function editar_estudiantes()
     $consulta = "UPDATE estudiantes SET nombre = ?, rut = ?, contacto = ?, nacimiento = ?, colegio = ?, curso = ? WHERE rut = ?";
 
     $stmt = mysqli_prepare($conex, $consulta);
-    mysqli_stmt_bind_param($stmt, "sssssi", $nombre, $rut, $contacto, $nacimiento, $colegio, $curso);
+    mysqli_stmt_bind_param($stmt, "sssssss", $nombre, $rut, $contacto, $nacimiento, $colegio, $curso, $rut);
     mysqli_stmt_execute($stmt);
 
     header('Location: datos.php');
 }
 
-function eliminar_estudiante()
-{
-    $conex = mysqli_connect("localhost", "root", "", "registro");
-    extract($_POST);
-    $id = $_POST['id'];
-    $consulta = "DELETE FROM estudiantes WHERE id= $id";
+function eliminar_estudiante($rut) {
+    global $conex;
 
-    mysqli_query($conex, $consulta);
+    // Eliminar registros relacionados en la tabla resultados
+    $sql_eliminar_resultados = "DELETE FROM resultados WHERE rut = '$rut'";
+    mysqli_query($conex, $sql_eliminar_resultados);
+    
+    // Eliminar registros relacionados en la tabla test
+    $sql_eliminar_test = "DELETE FROM test WHERE rut = '$rut'";
+    mysqli_query($conex, $sql_eliminar_test);
 
-    header('Location: inicio.php');
+    // Luego eliminar el estudiante
+    $sql_eliminar = "DELETE FROM estudiantes WHERE rut = '$rut'";
+    $resultado = mysqli_query($conex, $sql_eliminar);
+
+    if ($resultado) {
+        return true;
+    } else {
+        return "Error al eliminar: " . mysqli_error($conex);
+    }
 }
 
 function acceso_user()
@@ -63,7 +73,7 @@ function acceso_user()
     session_start();
     $_SESSION['nombre'] = $nombre;
 
-    $conex = mysqli_connect("localhost", "root", "", "registro");
+    $conex = mysqli_connect("localhost", "root", "", "testvocacional");
     $consulta = "SELECT * FROM user WHERE nombre='$nombre'";
     $resultado = mysqli_query($conex, $consulta);
     $filas = mysqli_fetch_array($resultado);
